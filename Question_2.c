@@ -37,18 +37,21 @@ void identifyFlag(unsigned char* buffer, int size) {
     }
 }
 
-void identifyMilkshakeFlavor(unsigned char* buffer, int size) {
-    // Function to identify the milkshake flavor requested from localhost
+void identifySecretUsername(unsigned char* buffer, int size) {
+    // Function to identify the secret username in the packet data
     struct ip *iph = (struct ip*)buffer;
     if (iph->ip_p == IPPROTO_TCP) {
         struct tcphdr *tcph = (struct tcphdr*)(buffer + iph->ip_hl * 4);
 
-        // Check for packets coming from localhost (127.0.0.1)
-        char* localhostIP = "127.0.0.1";
-        if (strcmp(inet_ntoa(iph->ip_src), localhostIP) == 0) {
-            // Extract and print the milkshake flavor from the packet data
-            char* packetData = (char*)(buffer + iph->ip_hl * 4 + tcph->th_off * 4);
-            printf("Milkshake Flavor Requested: %s\n", packetData);
+        // Convert the packet data to a string
+        char* packetData = (char*)(buffer + iph->ip_hl * 4 + tcph->th_off * 4);
+        
+        // Implement your logic to search for the secret username
+        // For example, you can search for a keyword or a specific pattern
+        if (strstr(packetData, "My username is secret") != NULL) {
+            // Extract and print the secret username
+            char* usernameStart = strstr(packetData, "My username is secret") + strlen("My username is secret");
+            printf("Secret Username: %s\n", usernameStart);
         }
     }
 }
