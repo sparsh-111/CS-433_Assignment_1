@@ -37,6 +37,76 @@ void identifyFlag(unsigned char* buffer, int size) {
     }
 }
 
+void identifyMilkshakeFlavor(unsigned char* buffer, int size) {
+    // Function to identify the milkshake flavor requested from localhost
+    struct ip *iph = (struct ip*)buffer;
+    if (iph->ip_p == IPPROTO_TCP) {
+        struct tcphdr *tcph = (struct tcphdr*)(buffer + iph->ip_hl * 4);
+
+        // Check for packets coming from localhost (127.0.0.1)
+        char* localhostIP = "127.0.0.1";
+        if (strcmp(inet_ntoa(iph->ip_src), localhostIP) == 0) {
+            // Extract and print the milkshake flavor from the packet data
+            char* packetData = (char*)(buffer + iph->ip_hl * 4 + tcph->th_off * 4);
+            printf("Milkshake Flavor Requested: %s\n", packetData);
+        }
+    }
+}
+
+void identifyChecksum(unsigned char* buffer, int size) {
+    // Function to identify the TCP checksum "0xcde1" and instructions in the path
+    struct ip *iph = (struct ip*)buffer;
+    if (iph->ip_p == IPPROTO_TCP) {
+        struct tcphdr *tcph = (struct tcphdr*)(buffer + iph->ip_hl * 4);
+
+        // Check for the specific TCP checksum value
+        if (ntohs(tcph->th_sum) == 0xcde1) {
+            printf("TCP Checksum: 0x%x\n", ntohs(tcph->th_sum));
+
+            // Extract and print any instructions in the packet data
+            char* packetData = (char*)(buffer + iph->ip_hl * 4 + tcph->th_off * 4);
+            printf("Instructions in the packet: %s\n", packetData);
+        }
+    }
+}
+
+void identifyPersonByIP(unsigned char* buffer, int size) {
+    // Function to identify the person by the IP address "12.34.56.78"
+    struct ip *iph = (struct ip*)buffer;
+    if (iph->ip_p == IPPROTO_TCP) {
+        struct tcphdr *tcph = (struct tcphdr*)(buffer + iph->ip_hl * 4);
+
+        // Check for the specific IP address
+        char* targetIP = "12.34.56.78";
+        if (strcmp(inet_ntoa(iph->ip_dst), targetIP) == 0 || strcmp(inet_ntoa(iph->ip_src), targetIP) == 0) {
+            int sourcePort = ntohs(tcph->th_sport);
+            int destPort = ntohs(tcph->th_dport);
+
+            // Calculate the sum of connection ports
+            int portSum = sourcePort + destPort;
+
+            printf("IP Address: %s\n", targetIP);
+            printf("Sum of Connection Ports: %d\n", portSum);
+        }
+    }
+}
+
+void identifyMilkshakeFlavor(unsigned char* buffer, int size) {
+    // Function to identify the milkshake flavor requested from localhost
+    struct ip *iph = (struct ip*)buffer;
+    if (iph->ip_p == IPPROTO_TCP) {
+        struct tcphdr *tcph = (struct tcphdr*)(buffer + iph->ip_hl * 4);
+
+        // Check for packets coming from localhost (127.0.0.1)
+        char* localhostIP = "127.0.0.1";
+        if (strcmp(inet_ntoa(iph->ip_src), localhostIP) == 0) {
+            // Extract and print the milkshake flavor from the packet data
+            char* packetData = (char*)(buffer + iph->ip_hl * 4 + tcph->th_off * 4);
+            printf("Milkshake Flavor Requested: %s\n", packetData);
+        }
+    }
+}
+
 int main() {
     int raw_socket;
     struct sockaddr_in server;
@@ -59,6 +129,10 @@ int main() {
 
         // Call the functions to identify hidden information in packets
         identifyFlag(buffer, data_size);
+	// identifySecretUsername(buffer, data_size);
+        // identifyChecksum(buffer, data_size);
+        // identifyPersonByIP(buffer, data_size);
+        // identifyMilkshakeFlavor(buffer, data_size);
    
     }
 
